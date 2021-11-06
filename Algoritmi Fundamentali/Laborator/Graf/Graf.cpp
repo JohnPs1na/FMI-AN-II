@@ -2,8 +2,8 @@
 
 using namespace std;
 
-ifstream fin("graf.in");
-ofstream fout("graf.out");
+ifstream fin("data.in");
+ofstream fout("data.out");
 
 class Graph {
 
@@ -76,11 +76,8 @@ void printv(vector<int> xs){
 
 int main() {
 
-    int n,m,s,e;
-    fin>>n>>m>>s>>e;
-    Graph g(n,m,false);
-    g.infoarena_graph();
-    g.solve_starting_ending_distance(s,e);
+    
+    
 
 }
 
@@ -201,7 +198,6 @@ void Graph::BCC(int vertex, vector<int> &parent, stack<int> &vertices_stack, vec
     // increment the discovery time of the vertex you are visiting
     // this is the only information you posses at the moment
     discovery_time[vertex] = lowest_reachable[vertex] = ++timer;
-    vertices_stack.push(vertex);
 
     for (int neighbor : adjacency_list[vertex]) {
 
@@ -209,6 +205,7 @@ void Graph::BCC(int vertex, vector<int> &parent, stack<int> &vertices_stack, vec
 
             //now for each neighbor you are checking in adjacency list you are pushing on stack the vertex you are currently visiting
             //assuming it is an articulation point
+            vertices_stack.push(vertex);
 
             //if the neighbor you are checking has not been visited yet you will visit him next via DFS
             if (parent[neighbor] == -1) {
