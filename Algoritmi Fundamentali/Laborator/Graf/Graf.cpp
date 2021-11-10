@@ -5,6 +5,16 @@ using namespace std;
 ifstream fin("ctc.in");
 ofstream fout("ctc.out");
  
+
+//Probleme
+//BFS https://www.infoarena.ro/job_detail/2788173?action=view-source
+//DFS https://www.infoarena.ro/job_detail/2788178?action=view-source
+//Biconex https://www.infoarena.ro/job_detail/2788743?action=view-source
+//CTC https://www.infoarena.ro/job_detail/2795579?action=view-source
+//sortaret https://www.infoarena.ro/job_detail/2789749?action=view-source
+//Graf https://www.infoarena.ro/job_detail/2791468?action=view-source
+
+
  
 class Graph {
  
