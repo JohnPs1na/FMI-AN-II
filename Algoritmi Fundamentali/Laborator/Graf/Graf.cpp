@@ -14,9 +14,9 @@ ofstream fout("ctc.out");
 //sortaret https://www.infoarena.ro/job_detail/2789749?action=view-source
 //RJ https://www.infoarena.ro/job_detail/2791322?action=view-source
 //Graf https://www.infoarena.ro/job_detail/2791468?action=view-source
+//Critical connections in a network https://leetcode.com/submissions/detail/578227255/
 
 
- 
 class Graph {
  
 private:
