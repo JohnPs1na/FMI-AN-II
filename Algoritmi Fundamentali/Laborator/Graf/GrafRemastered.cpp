@@ -16,8 +16,8 @@
 
 using namespace std;
  
-ifstream fin("ctc.in");
-ofstream fout("ctc.out");
+ifstream fin("apm.in");
+ofstream fout("apm.out");
  
 struct Edge
 {
@@ -29,9 +29,15 @@ struct Edge
             source(source),
             destination(destination),
             cost(cost) { }
+    
+    friend ostream& operator<<(ostream& out, const Edge& e);
 };
  
- 
+ostream& operator<<(ostream& out, const Edge& e)
+{
+    out<<e.source<<' '<<e.destination<<' '<<e.cost<<'\n';
+    return out;
+}
 class Graph{
  
 private:
@@ -40,6 +46,7 @@ private:
     int vertices, edges;
     bool oriented, weighted;
     vector<vector<Edge>> adjacency_list;
+    vector<Edge> edges_list;
  
     //To compute:
     vector<int> distances;
@@ -47,6 +54,7 @@ private:
     vector<vector<int>> strongly_connected_components;
     vector<int> topological;
     vector<pair<int,int>> bridges;
+    vector<Edge> APM;
  
 
     //private functions
@@ -72,7 +80,7 @@ private:
 
     //homework 2;
 
-    void KRUSKAL();
+    void KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost);
 
 public:
 
@@ -109,9 +117,10 @@ public:
 
     void solve_apm();
 };
- 
-void printv(vector<int> xs){
-    for(int i : xs) cout<<i<<' ';
+
+template <class T>
+void printv(vector<T> xs){
+    for(T i : xs) cout<<i<<' ';
     cout<<'\n';
 }
  
@@ -119,10 +128,9 @@ int main()
 {
     int n, m;
     fin>>n>>m;
-    Graph g(n,m,true);
+    Graph g(n,m,false,true);
     g.infoarena_graph();
-    g.solve_strongly_connected_kosaraju();
-
+    g.solve_apm();
 }
 
 #pragma region utilities
@@ -154,7 +162,10 @@ void Graph::infoarena_graph() {
         if(weighted)
             fin>>c;
  
-        adjacency_list[x].push_back(Edge(x,y,c));
+        Edge e(x,y,c);
+        
+        adjacency_list[x].push_back(e);
+        edges_list.push_back(e);
  
         if(!oriented)
             adjacency_list[y].push_back(Edge(y,x,c));
@@ -365,14 +376,51 @@ int Graph::find(int v,vector<int>& parent)
 
 bool Graph::unite(int v1, int v2,vector<int>& parent, vector<int>& dimension)
 {
+    int v1_parent = find(v1,parent);
+    int v2_parent = find(v2,parent);
 
+    if(v1_parent == v2_parent) return false;
+
+    if(dimension[v1_parent] <= dimension[v2_parent])
+    {
+        parent[v1_parent] = v2_parent;
+        dimension[v2_parent] += dimension[v1_parent];
+    }
+    else
+    {
+        parent[v2_parent] = v1_parent;
+        dimension[v1_parent] += dimension[v2_parent];
+    }
+    return true;
 }
-void Graph::KRUSKAL()
+
+void Graph::KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost)
 {
 
-}
+    sort(edges_list.begin(),edges_list.end(),[](Edge e1,Edge e2){ return e1.cost < e2.cost;});
 
+    for(auto e : edges_list)
+        if(unite(e.source,e.destination,parent,dimension))
+        {
+            total_cost+=e.cost;
+            APM.push_back(e);
+        }
+    
+}
 void Graph::solve_apm()
 {
+    vector<int> parent(vertices+1);
+    vector<int> dimension(vertices+1,1);
 
+    for(int i = 1;i<vertices+1;i++)
+        parent[i] = i;
+    
+    int total_cost = 0;
+
+    KRUSKAL(parent,dimension,total_cost);
+
+    fout<<total_cost<<'\n';
+    fout<<APM.size()<<'\n';
+    for(auto e : APM)
+        fout<<e.source<<' '<<e.destination<<'\n';
 }
