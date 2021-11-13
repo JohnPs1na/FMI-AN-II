@@ -5,6 +5,7 @@
 #include <queue>
 #include <fstream>
 #include <list>
+#include <climits>
 
 //DE REZOLVAT BICONEX!
 //DE REZOLVAT BICONEX!
@@ -16,8 +17,8 @@
 
 using namespace std;
  
-ifstream fin("apm.in");
-ofstream fout("apm.out");
+ifstream fin("bellmanford.in");
+ofstream fout("bellmanford.out");
  
 struct Edge
 {
@@ -32,12 +33,18 @@ struct Edge
     
     friend ostream& operator<<(ostream& out, const Edge& e);
 };
- 
+
+struct compareCost{
+    bool operator()(Edge& e1, Edge& e2){ return e1.cost > e2.cost; }
+};
+
 ostream& operator<<(ostream& out, const Edge& e)
 {
     out<<e.source<<' '<<e.destination<<' '<<e.cost<<'\n';
     return out;
 }
+
+
 class Graph{
  
 private:
@@ -64,9 +71,9 @@ private:
  
     void DFS(int vertex, vector<int>& visited);
  
-    void BCCTJ(); //Tarjan Algorithm
+    void BCCTJ(); 
  
-    void BCCKJ(); //Kosaraju Algorithm
+    void BCCKJ(); 
  
     void SCCTJ(int vertex, stack<int>& vertices_stack, vector<int>& discovery_time, vector<int>& lowest_reachable, vector<bool>& has_component,int& timer);
  
@@ -81,6 +88,10 @@ private:
     //homework 2;
 
     void KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost);
+
+    void DIJKSTRA(int vertex, vector<int>& dist, priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>& heap);
+
+    void BELLMANFORD(int vertex, vector<int>& dist, queue<int>& que);
 
 public:
 
@@ -115,8 +126,16 @@ public:
 
     bool unite(int v1,int v2,vector<int>& parent, vector<int>& dimension);
 
+    void update(int v1,int v2, int cost, vector<int>& dist);
+
     void solve_apm();
+
+    void solve_dijkstra();
+
+    void solve_bellman_ford();
 };
+
+
 
 template <class T>
 void printv(vector<T> xs){
@@ -126,12 +145,12 @@ void printv(vector<T> xs){
  
 int main()
 {
-    int n, m;
-    fin>>n>>m;
-    Graph g(n,m,false,true);
-    g.infoarena_graph();
-    g.solve_apm();
+
+
+
 }
+
+
 
 #pragma region utilities
 Graph::Graph(int vertices, int edges, bool oriented, bool weighted) :
@@ -407,6 +426,60 @@ void Graph::KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost)
         }
     
 }
+
+void Graph::DIJKSTRA(int vertex, vector<int>& dist, priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>& heap)
+{
+    dist[vertex] = 0;
+    heap.push({0,vertex});
+    vector<int> vis(vertices+1,0);
+
+    while(!heap.empty())
+    {
+        int node = heap.top().second;
+        heap.pop();
+
+        if(!vis[node])
+            for(auto path : adjacency_list[node])
+            {
+                if(!vis[path.destination])
+                    if(dist[path.destination] == -1 || dist[path.destination] > path.cost + dist[node]){
+                        dist[path.destination] = path.cost + dist[node];
+                        heap.push({dist[path.destination],path.destination});
+                    }
+            }
+        vis[node] = 1;
+    }
+}
+
+
+void Graph::BELLMANFORD(int vertex,vector<int>& dist,queue<int>& que)
+{
+    que.push(vertex);
+    dist[vertex] = 0;
+
+    vector<int> cont(vertices+1,0);
+
+    while(!que.empty())
+    {
+        int node = que.front();
+        que.pop();
+        cont[node] += 1;
+        if(cont[node] > vertices) return;
+
+        for(auto path : adjacency_list[node])
+        {
+            int v2 = path.destination;
+            int cost = path.cost;
+            if(dist[v2] > dist[node] + cost)
+            {
+                dist[v2] = dist[node] + cost;
+                que.push(v2);
+            }
+        }
+
+    }
+}
+
 void Graph::solve_apm()
 {
     vector<int> parent(vertices+1);
@@ -423,4 +496,41 @@ void Graph::solve_apm()
     fout<<APM.size()<<'\n';
     for(auto e : APM)
         fout<<e.source<<' '<<e.destination<<'\n';
+}
+
+void Graph::solve_dijkstra()
+{
+    vector<int> dist(vertices+1,-1);
+    priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>> heap;
+
+    DIJKSTRA(1,dist,heap);
+
+    for(int i = 2;i<vertices+1;i++)
+    {
+        if(dist[i] == -1)
+            fout<<0<<' ';
+        else fout<<dist[i]<<' ';
+    }
+}
+
+void Graph::solve_bellman_ford()
+{
+    vector<int> dist(vertices+1,INT_MAX);
+    queue<int> que;
+
+    BELLMANFORD(1,dist,que);
+
+    for(int i = 0;i<edges;i++)
+    {
+        int v1 = edges_list[i].source;
+        int v2 = edges_list[i].destination;
+        int cost = edges_list[i].cost;
+        if(dist[v1] != INT_MAX && dist[v1] + cost < dist[v2])
+            {
+                fout<<"Ciclu negativ!";
+                return;
+            }
+    }
+    for(int i = 2;i<vertices+1;i++)
+        fout<<dist[i]<<' ';
 }
