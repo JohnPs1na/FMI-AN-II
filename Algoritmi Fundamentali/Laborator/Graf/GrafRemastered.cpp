@@ -6,19 +6,12 @@
 #include <fstream>
 #include <list>
 #include <climits>
-
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
-//DE REZOLVAT BICONEX!
+#include <unordered_set>
 
 using namespace std;
  
-ifstream fin("bellmanford.in");
-ofstream fout("bellmanford.out");
+ifstream fin("biconex.in");
+ofstream fout("biconex.out");
  
 struct Edge
 {
@@ -57,7 +50,7 @@ private:
  
     //To compute:
     vector<int> distances;
-    vector<list<int>> biconnected_components;
+    vector<unordered_set<int>> biconnected_components;
     vector<vector<int>> strongly_connected_components;
     vector<int> topological;
     vector<pair<int,int>> bridges;
@@ -71,9 +64,7 @@ private:
  
     void DFS(int vertex, vector<int>& visited);
  
-    void BCCTJ(); 
- 
-    void BCCKJ(); 
+    void BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vector<int>& discovery_time, vector<int>& lowest_reachable,int& timer); 
  
     void SCCTJ(int vertex, stack<int>& vertices_stack, vector<int>& discovery_time, vector<int>& lowest_reachable, vector<bool>& has_component,int& timer);
  
@@ -109,8 +100,7 @@ public:
  
     void solve_connected_components();
  
-    void solve_biconnected_tarjan();
-    void solve_biconnected_kosaraju();
+    void solve_biconnected();
 
     void solve_strongly_connected_tarjan();
     void solve_strongly_connected_kosaraju();
@@ -146,7 +136,15 @@ void printv(vector<T> xs){
 int main()
 {
 
-
+	
+    int N,M;
+ 
+    fin>>N>>M;
+ 
+    Graph g(N,M, false);
+    g.infoarena_graph();
+ 
+    g.solve_biconnected();
 
 }
 
@@ -229,6 +227,43 @@ void Graph::DFS(int vertex, vector<int>& visited)
             DFS(path.destination,visited);
 }
 
+void Graph::BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vector<int>& discovery_time, vector<int>& lowest_reachable,int& timer)
+{
+    discovery_time[vertex] = lowest_reachable[vertex] = ++timer;
+
+    for(auto path : adjacency_list[vertex])
+    {
+        vertices_stack.push(vertex);
+
+        if(parent[path.destination] == -1){
+            parent[path.destination] = vertex;
+            BCC(path.destination,parent,vertices_stack,discovery_time,lowest_reachable,timer);
+
+            lowest_reachable[vertex] = min(lowest_reachable[vertex],lowest_reachable[path.destination]);
+
+            if(discovery_time[vertex] <= lowest_reachable[path.destination])
+            {
+                int aux;
+                biconnected_components.push_back(unordered_set<int>());
+                int n = biconnected_components.size();
+                aux = vertices_stack.top();
+                while(aux!=vertex)
+                {
+                    if(biconnected_components[n-1].find(aux) == biconnected_components[n-1].end()){
+                        biconnected_components[n-1].insert(aux);
+                    }
+                    aux = vertices_stack.top();
+                    vertices_stack.pop();
+                }
+                biconnected_components[n-1].insert(aux);
+            }
+        }
+        else{
+            lowest_reachable[vertex] = min(lowest_reachable[vertex],discovery_time[path.destination]);
+        }
+    }
+}
+
 void Graph::SCCTJ(int vertex,stack<int>& vertices_stack, vector<int>& discovery_time,vector<int>& lowest_reachable, vector<bool>& has_component, int& timer)
 {
     discovery_time[vertex] = lowest_reachable[vertex] = ++timer;
@@ -304,9 +339,10 @@ void Graph::TOPOLOGICAL_SORT(int vertex, vector<int>& visited){
             TOPOLOGICAL_SORT(path.destination,visited);
     topological.push_back(vertex);
 }
+
 #pragma endregion 
 
-#pragma region Homework2_solutions
+#pragma region Homework1_solutions
 void Graph::solve_distances(int starting_vertex) 
 {
     BFS(starting_vertex);
@@ -325,6 +361,27 @@ void Graph::solve_connected_components()
     fout<<cnt;
 }
  
+void Graph::solve_biconnected(){
+    	
+    stack<int> vertices_stack;
+    vector<int> parent(vertices+1,-1);
+    vector<int> discovery_time(vertices+1,0);
+    vector<int> lowest_reachable(vertices+1,0);
+
+    int timer = 0;
+
+    BCC(1,parent,vertices_stack,discovery_time,lowest_reachable,timer);
+
+    fout<<biconnected_components.size()<<'\n';
+    for(auto components : biconnected_components){
+        for(auto i : components){
+            fout<<i<<' ';
+        }
+        fout<<'\n';
+    }
+
+}
+
 void Graph::solve_strongly_connected_tarjan()
 {
     stack<int> vertices_stack;
