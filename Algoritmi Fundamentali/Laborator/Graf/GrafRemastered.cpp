@@ -152,15 +152,7 @@ int main()
 {
 
 	
-    int N,M;
- 
-    fin>>N>>M;
- 
-    Graph g(N,M, false);
-    g.infoarena_graph();
- 
-    g.solve_biconnected();
-
+	return 0;
 }
 
 
