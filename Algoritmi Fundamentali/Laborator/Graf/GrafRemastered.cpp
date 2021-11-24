@@ -19,14 +19,14 @@
 //Graf https://www.infoarena.ro/job_detail/2791468?action=view-source
 //Critical connections in a network https://leetcode.com/submissions/detail/578227255/
 //Disjoint https://www.infoarena.ro/job_detail/2799580?action=view-source
-//APM (Kruskal) https://www.infoarena.ro/job_detail/2799355?action=view-source
+//APM (Kruskall) https://www.infoarena.ro/job_detail/2799355?action=view-source
 //Dijkstra https://www.infoarena.ro/job_detail/2799949?action=view-source
 //Bellman-Ford https://www.infoarena.ro/job_detail/2800728?action=view-source
 
 using namespace std;
  
-ifstream fin("biconex.in");
-ofstream fout("biconex.out");
+ifstream fin("data.in");
+ofstream fout("data.out");
  
 struct Edge
 {
@@ -107,6 +107,8 @@ public:
 
     vector<int> get_topological(){return topological;}
 
+    void add_edge(int v1,int v2,int c = 0);
+
     void infoarena_graph();
  
     void show_my_graph();
@@ -152,7 +154,13 @@ int main()
 {
 
 	
-	return 0;
+    int N,M;
+ 
+    fin>>N>>M;
+ 
+    Graph g(N,M,true,false);
+    g.infoarena_graph();
+    g.solve_strongly_connected_kosaraju();
 }
 
 
@@ -176,6 +184,11 @@ Graph Graph::transpose()
     return gt;
 }
  
+void Graph::add_edge(int v1,int v2,int c)
+{
+    adjacency_list[v1].push_back(Edge(v1,v2,c));
+}
+
 void Graph::infoarena_graph() {
     int x,y;
     int c = 0;
@@ -244,10 +257,15 @@ void Graph::BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vecto
 
         if(parent[path.destination] == -1){
             parent[path.destination] = vertex;
+            
+            //will DFS till it reaches a leaf in dfs tree pushing nodes into the stack
             BCC(path.destination,parent,vertices_stack,discovery_time,lowest_reachable,timer);
 
+            //will recurr till it meet an articulation point 
+            //updating lowest reachable value to the min of all its neighbors
             lowest_reachable[vertex] = min(lowest_reachable[vertex],lowest_reachable[path.destination]);
 
+            //articulation point is found when its discovery time is less than or equal to the lowest_reachable value of the neighbor
             if(discovery_time[vertex] <= lowest_reachable[path.destination])
             {
                 int aux;
@@ -265,11 +283,14 @@ void Graph::BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vecto
                 biconnected_components[n-1].insert(aux);
             }
         }
+
+        //the leaf will check all cross edges of the dfs tree and update lowest_reachable to the first discovered
         else{
             lowest_reachable[vertex] = min(lowest_reachable[vertex],discovery_time[path.destination]);
         }
     }
 }
+
 
 void Graph::SCCTJ(int vertex,stack<int>& vertices_stack, vector<int>& discovery_time,vector<int>& lowest_reachable, vector<bool>& has_component, int& timer)
 {
@@ -281,14 +302,19 @@ void Graph::SCCTJ(int vertex,stack<int>& vertices_stack, vector<int>& discovery_
     {
         if(discovery_time[path.destination]==-1)
         {
+            //will DFS till it reaches a leaf
             SCCTJ(path.destination,vertices_stack,discovery_time,lowest_reachable,has_component,timer);
+
+            //continue updating values of lowest reachable ancestor till we found an articulation point
             lowest_reachable[vertex] = min(lowest_reachable[vertex],lowest_reachable[path.destination]);
         }
-
+        //if the leaf is not a part(because we need a max component) of a connected component, update value of its lowest reachable ancestor
         else if (!has_component[path.destination])
             lowest_reachable[vertex] = min(lowest_reachable[vertex],discovery_time[path.destination]);
     }
     
+    // oriented !!
+    // neither descendants nor vertex itself has no cross edges to vertex ancestors, means it is an articulation point
     if(lowest_reachable[vertex] == discovery_time[vertex])
     {
         vector<int> component;
@@ -416,8 +442,12 @@ void Graph::solve_strongly_connected_kosaraju()
 
     solve_topological();
 
+    printv(topological);
+
     Graph gt = transpose();
 
+    //will iterate through topologically sorted vector and will do dfs from all unvisited vertices
+    //all the dfs will form strongly conected components
     for(int i = topological.size()-1;i>=0;i--)
     {
         if(!visited[topological[i]])
@@ -450,6 +480,7 @@ void Graph::solve_topological()
 
 
 //homework 2;
+
 int Graph::find(int v,vector<int>& parent)
 {
     while(v!=parent[v])
@@ -477,11 +508,13 @@ bool Graph::unite(int v1, int v2,vector<int>& parent, vector<int>& dimension)
     return true;
 }
 
+
 void Graph::KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost)
 {
-
+    //sort edges by cost 
     sort(edges_list.begin(),edges_list.end(),[](Edge e1,Edge e2){ return e1.cost < e2.cost;});
 
+    //select each optimal edge
     for(auto e : edges_list)
         if(unite(e.source,e.destination,parent,dimension))
         {
@@ -491,12 +524,15 @@ void Graph::KRUSKAL(vector<int>& parent, vector<int>& dimension,int& total_cost)
     
 }
 
+
 void Graph::DIJKSTRA(int vertex, vector<int>& dist, priority_queue<pair<int,int>,vector<pair<int,int>>,greater<pair<int,int>>>& heap)
 {
     dist[vertex] = 0;
     heap.push({0,vertex});
     vector<int> vis(vertices+1,0);
 
+    //basically a BFS
+    //we always select to add a edge from a vertex with minimal distance
     while(!heap.empty())
     {
         int node = heap.top().second;
@@ -508,7 +544,7 @@ void Graph::DIJKSTRA(int vertex, vector<int>& dist, priority_queue<pair<int,int>
                 if(!vis[path.destination])
                     if(dist[path.destination] == -1 || dist[path.destination] > path.cost + dist[node]){
                         dist[path.destination] = path.cost + dist[node];
-                        heap.push({dist[path.destination],path.destination});
+                        heap.push({dist[path.destination],path.destination});   
                     }
             }
         vis[node] = 1;
@@ -521,14 +557,18 @@ void Graph::BELLMANFORD(int vertex,vector<int>& dist,queue<int>& que)
     que.push(vertex);
     dist[vertex] = 0;
 
-    vector<int> cont(vertices+1,0);
+    vector<int> check_count(vertices+1,0); //will check if a node has been checked n times
+                                           //if so quit 
 
     while(!que.empty())
     {
         int node = que.front();
         que.pop();
-        cont[node] += 1;
-        if(cont[node] > vertices) return;
+        check_count[node] += 1; 
+
+        if(check_count[node] > vertices){
+            return; 
+        }
 
         for(auto path : adjacency_list[node])
         {
