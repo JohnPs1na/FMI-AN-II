@@ -308,7 +308,8 @@ void Graph::SCCTJ(int vertex,stack<int>& vertices_stack, vector<int>& discovery_
             //continue updating values of lowest reachable ancestor till we found an articulation point
             lowest_reachable[vertex] = min(lowest_reachable[vertex],lowest_reachable[path.destination]);
         }
-        //if the leaf is not a part(because we need a max component) of a connected component, update value of its lowest reachable ancestor
+        //if its not a part(because we need a max component) of a connected component, update value of its lowest reachable
+	//to the value of the ancestor discovery_time    
         else if (!has_component[path.destination])
             lowest_reachable[vertex] = min(lowest_reachable[vertex],discovery_time[path.destination]);
     }
