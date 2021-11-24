@@ -19,7 +19,7 @@
 //Graf https://www.infoarena.ro/job_detail/2791468?action=view-source
 //Critical connections in a network https://leetcode.com/submissions/detail/578227255/
 //Disjoint https://www.infoarena.ro/job_detail/2799580?action=view-source
-//APM (Kruskall) https://www.infoarena.ro/job_detail/2799355?action=view-source
+//APM (Kruskal) https://www.infoarena.ro/job_detail/2799355?action=view-source
 //Dijkstra https://www.infoarena.ro/job_detail/2799949?action=view-source
 //Bellman-Ford https://www.infoarena.ro/job_detail/2800728?action=view-source
 
