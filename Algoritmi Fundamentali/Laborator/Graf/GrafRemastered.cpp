@@ -8,6 +8,21 @@
 #include <climits>
 #include <unordered_set>
 
+
+//Probleme
+//BFS https://www.infoarena.ro/job_detail/2788173?action=view-source
+//DFS https://www.infoarena.ro/job_detail/2788178?action=view-source
+//Biconex https://www.infoarena.ro/job_detail/2788743?action=view-source
+//CTC https://www.infoarena.ro/job_detail/2795579?action=view-source
+//sortaret https://www.infoarena.ro/job_detail/2789749?action=view-source
+//RJ https://www.infoarena.ro/job_detail/2791322?action=view-source
+//Graf https://www.infoarena.ro/job_detail/2791468?action=view-source
+//Critical connections in a network https://leetcode.com/submissions/detail/578227255/
+//Disjoint https://www.infoarena.ro/job_detail/2799580?action=view-source
+//APM (Kruskall) https://www.infoarena.ro/job_detail/2799355?action=view-source
+//Dijkstra https://www.infoarena.ro/job_detail/2799949?action=view-source
+//Bellman-Ford https://www.infoarena.ro/job_detail/2800728?action=view-source
+
 using namespace std;
  
 ifstream fin("biconex.in");
