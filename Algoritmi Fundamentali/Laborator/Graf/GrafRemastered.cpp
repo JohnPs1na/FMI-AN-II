@@ -284,7 +284,7 @@ void Graph::BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vecto
             }
         }
 
-        //the leaf will check all cross edges of the dfs tree and update lowest_reachable to the first discovered
+        //will check all cross edges of the dfs tree and update lowest_reachable to the first discovered
         else{
             lowest_reachable[vertex] = min(lowest_reachable[vertex],discovery_time[path.destination]);
         }
