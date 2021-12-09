@@ -753,6 +753,8 @@ int Graph::solve_max_flow()
     vector<vector<int>> flow(vertices+1,vector<int>(vertices+1,0));
     vector<int> parent(vertices+1,0);
  
+	//de rectificat!
+	
     for(int i = 1;i<=edges;i++)
     {
         int s,d,c;
