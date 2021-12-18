@@ -7,7 +7,8 @@
 #include <list>
 #include <climits>
 #include <unordered_set>
- 
+#include <unordered_map>
+
 #define INF INT_MAX/2
  
  
@@ -27,8 +28,8 @@
  
 using namespace std;
  
-ifstream fin("maxflow.in");
-ofstream fout("maxflow.out");
+ifstream fin("ciclueuler.in");
+ofstream fout("ciclueuler.out");
  
 struct Edge
 {
@@ -41,6 +42,7 @@ struct Edge
             destination(destination),
             cost(cost) { }
     
+    Edge flip(){ return Edge(destination,source,cost);}
     friend ostream& operator<<(ostream& out, const Edge& e);
 };
  
@@ -99,6 +101,10 @@ private:
     void ROYFLOYD(vector<vector<int>>& matrix_of_weights);
  
     bool MAXFLOW(int source, int destination, vector<vector<int>>& capacity, vector<vector<int>>& flow, vector<int>& parent);
+
+    //homework 4;
+
+    void EULER(int vertex, vector<int>& euler_cycle,vector<bool>& visited);
  
 public:
  
@@ -147,6 +153,9 @@ public:
     vector<vector<int>> solve_roy_floyd(vector<vector<int>>& matrix_of_weights);
  
     int solve_max_flow(vector<vector<int>>& capacity);
+
+    //homework 4;
+    vector<int> solve_euler();
 };
  
  
@@ -160,6 +169,23 @@ void printv(vector<T> xs){
 int main()
 {
 
+    int N,M;
+    fin>>N>>M;
+
+    Graph g(N);
+    for(int i = 0;i<M;i++)
+    {
+        int x,y;
+        fin>>x>>y;
+        g.add_edge(x,y,i+1);
+    }
+
+    vector<int> x = g.solve_euler();
+    if(x[0])
+    {
+        for(int i = 0;i<x.size()-1;i++)
+            fout<<x[i]<<' ';
+    }
 }
  
  
@@ -185,7 +211,12 @@ Graph Graph::transpose()
  
 void Graph::add_edge(int v1,int v2,int c)
 {
-    adjacency_list[v1].push_back(Edge(v1,v2,c));
+    Edge e(v1,v2,c);
+    adjacency_list[v1].push_back(e);
+    edges_list.push_back(e);
+
+    if(!oriented)
+        adjacency_list[v2].push_back(e.flip());
     edges++;
 }
  
@@ -795,3 +826,42 @@ int Graph::solve_max_flow(vector<vector<int>>& capacity)
     }
     return max_flow;
 }
+
+
+#pragma region Homework4
+
+void Graph::EULER(int vertex,vector<int>& euler_cycle,vector<bool>& visited)
+{
+    while(adjacency_list[vertex].size())
+    {
+        int neighbor = adjacency_list[vertex].back().destination;
+        int id = adjacency_list[vertex].back().cost;
+        adjacency_list[vertex].pop_back();
+
+        if(!visited[id])
+        {
+            visited[id] = true;
+            EULER(neighbor,euler_cycle,visited);
+        }
+    }
+    euler_cycle.push_back(vertex);
+}
+
+vector<int> Graph::solve_euler()
+{
+
+    vector<int> euler_cycle;
+
+    for(int i = 1;i<=vertices;i++)
+        if(adjacency_list[i].size() & 1)
+            {
+                fout<<"-1\n";
+                return vector<int>(1,0);
+            }
+
+    vector<bool> visited(edges+1,false);
+    EULER(1,euler_cycle,visited);
+    return euler_cycle;
+}
+
+#pragma endregion
