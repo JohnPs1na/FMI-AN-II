@@ -64,11 +64,10 @@ class Graph{
 private:
  
     //private variables
-    int vertices, edges;
-    bool oriented, weighted;
+    int vertices, edges;  //number of nodes, number of edges
+    bool oriented, weighted; //shows whether the graph is oriented and pondered
     vector<vector<Edge>> adjacency_list;
-    vector<Edge> edges_list;
- 
+    vector<Edge> edges_list;             
  
  
     //private functions
@@ -136,10 +135,10 @@ public:
     vector<int> solve_starting_ending_distance(int starting_vertex,int ending_vertex);
  
     //homework 2;
+ 
+ //disjoint set
     int find(int v,vector<int>& parent);
- 
     bool unite(int v1,int v2,vector<int>& parent, vector<int>& dimension);
- 
     void update(int v1,int v2, int cost, vector<int>& dist);
  
     pair<vector<Edge>,int> solve_apm();
