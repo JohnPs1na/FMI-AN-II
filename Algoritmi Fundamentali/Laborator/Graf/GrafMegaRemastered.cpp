@@ -892,15 +892,15 @@ int Graph::solve_salesman()
  
     C[1][0] = 0;
     
-    for(int mask = 1;mask < (1 << vertices); mask++)
-        for(int node = 0;node < vertices;node++)
-            if(mask & (1 << node))
+    for(int mask = 1;mask < (1 << vertices); mask++)  //00...1  -> 11...1
+        for(int node = 0;node < vertices;node++) //check all the nodes
+            if(mask & (1 << node)) //verify if the node is is this particular configuration (mask)
                 for(auto& path : adjacency_list[node])
                 {
                     int neighbor = path.destination;
                     int cost = path.cost;
-                    if(mask & (1<<neighbor))
-                        C[mask][node] = min(C[mask][node], C[(1<<node) ^ mask][neighbor] + cost);
+                    if(mask & (1<<neighbor))  //verify if the neighbor is in this particular configuration
+                        C[mask][node] = min(C[mask][node], C[(1<<node) ^ mask][neighbor] + cost);  //update the matrix
                 }
  
     for(auto& path : adjacency_list[0])  
