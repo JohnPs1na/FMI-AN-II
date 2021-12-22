@@ -77,18 +77,17 @@ private:
  
     void DFS(int vertex, vector<int>& visited);
  
+ //biconnected components
     void BCC(int vertex, vector<int>& parent,stack<int>& vertices_stack,vector<int>& discovery_time, vector<int>& lowest_reachable,vector<unordered_set<int>>& biconnected_components,int& timer); 
- 
+ //strongly connected components, tarjan method
     void SCCTJ(int vertex, stack<int>& vertices_stack, vector<int>& discovery_time, vector<int>& lowest_reachable, vector<bool>& has_component,vector<vector<int>>& strongly_connected_components,int& timer);
- 
+ //strongly connected components, kosaraju method
     void SCCKJ(int vertex,vector<bool>& visited, vector<int>& component);
- 
+ //critical connections 
     void CCN(int vertex, vector<int> &discovery_time, vector<int> &lowest_reachable,vector<bool>& visited,vector<int>& parent,vector<pair<int,int>>& bridges, int &timer);
- 
+
     void TOPOLOGICAL_SORT(int vertex, vector<int>& visited,vector<int>& topological);
- 
-    vector<int> BFSMD(int starting_vertex);
- 
+  
  
     //homework 2;
  
@@ -107,9 +106,7 @@ private:
     //homework 4;
  
     void EULER(int vertex, vector<int>& euler_cycle,vector<bool>& visited);
- 
-    void HAMILTON();
- 
+  
 public:
  
     Graph(int vertices = 0,int edges = 0,bool oriented = false,bool weighted = false);
