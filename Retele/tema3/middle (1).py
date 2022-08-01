@@ -11,10 +11,6 @@ SYN = 0x02
 PSH = 0x08
 ACK = 0x10
 
-
-hacked_seq = dict()
-hacked_ack = dict()
-
 client_ip = "172.10.0.1"
 server_ip = "198.10.0.2"
 
