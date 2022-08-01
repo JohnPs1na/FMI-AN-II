@@ -27,8 +27,6 @@ with open("poza_router.png", "rb") as image:
 def proceseaza(pachet):
     global client_ip
     global server_ip
-    global hacked_seq 
-    global hacked_ack
     global heck,idx
 
     octeti = pachet.get_payload()
